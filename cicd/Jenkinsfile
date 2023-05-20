@@ -12,12 +12,12 @@ pipeline {
         stage('Build Image') {
             steps {
                 sh '''
-                   cd Cat && docker build -t wli0807/Cat:JR10 .
+                   cd Cat && docker build -t wli0807/cat:JR10 .
                    cd ../helloworld && docker build -t wli0807/helloworld:JR10 .
-                   cd ../mynginx && docker build -t wli0807/mynginx:JR10 .
-                   docker tag wli0807/Cat:JR10 wli0807/Cat:latest
+                   cd ../web-nginx && docker build -t wli0807/web-nginx:JR10 .
+                   docker tag wli0807/cat:JR10 wli0807/cat:latest
                    docker tag wli0807/helloworld:JR10 wli0807/helloworld:latest
-                   docker tag wli0807/mynginx:JR10 wli0807/mynginx:latest
+                   docker tag wli0807/web-nginx:JR10 wli0807/web-nginx:latest
                    docker images
 		        '''
             }
@@ -28,8 +28,8 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSWD', usernameVariable: 'USER')]) {
                     sh """                        
                         docker login -u $USER -p $PSWD
-                        for img in wli0807/Cat:JR10 wli0807/Cat:latest wli0807/helloworld:JR10 wli0807/helloworld:latest \
-                               wli0807/mynginx:JR10 wli0807/mynginx:latest; \
+                        for img in wli0807/cat:JR10 wli0807/cat:latest wli0807/helloworld:JR10 wli0807/helloworld:latest \
+                               wli0807/web-nginx:JR10 wli0807/web-nginx:latest; \
                         do docker push \$img; done;
                     """
                 }
