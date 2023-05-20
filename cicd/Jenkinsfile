@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Hello') {
+            steps {
+                echo 'Hello World'
+                sh 'pwd'
+            }
+        }
+
+        stage('Build Image') {
+            steps {
+                sh '''
+                   cd cat && docker build -t wli0807/cat:JR10 .
+                   cd ../helloworld && docker build -t wli0807/helloworld:JR10 .
+                   cd ../mynginx && docker build -t wli0807/mynginx:JR10 .
+                   docker tag wli0807/cat:JR10 wli0807/cat:latest
+                   docker tag wli0807/helloworld:JR10 wli0807/helloworld:latest
+                   docker tag wli0807/mynginx:JR10 wli0807/mynginx:latest
+                   docker images
+		        '''
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'PSWD', usernameVariable: 'USER')]) {
+                    sh """                        
+                        docker login -u $USER -p $PSWD
+                        for img in wli0807/cat:JR10 wli0807/cat:latest wli0807/helloworld:JR10 wli0807/helloworld:latest \
+                               wli0807/mynginx:JR10 wli0807/mynginx:latest; \
+                        do docker push \$img; done;
+                    """
+                }
+
+            }
+        }
+
+        stage('Deploy Service') {
+            steps {
+                sh '''
+                    docker-compose down
+                    docker-compose up -d
+                    docker-compose ps
+                '''
+            }
+        }
+
+    }
+}
