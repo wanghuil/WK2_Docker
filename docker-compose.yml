@@ -3,7 +3,7 @@ services:
   helloworld:
     image: wli0807/helloworld
   mynginx:
-    image: wli0807/web-nginx:10
+    image: wli0807/mynginx:10
     ports:
     - "5001:80"
   cat:
