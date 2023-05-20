@@ -14,10 +14,10 @@ pipeline {
                 sh '''
                    cd Cat && docker build -t wli0807/cat:JR10 .
                    cd ../helloworld && docker build -t wli0807/helloworld:JR10 .
-                   cd ../mynginx && docker build -t wli0807/mynginx:JR10 .
+                   cd ../web-nginx && docker build -t wli0807/web-nginx:JR10 .
                    docker tag wli0807/cat:JR10 wli0807/cat:latest
                    docker tag wli0807/helloworld:JR10 wli0807/helloworld:latest
-                   docker tag wli0807/mynginx:JR10 wli0807/mynginx:latest
+                   docker tag wli0807/web-nginx:JR10 wli0807/web-nginx:latest
                    docker images
 		        '''
             }
@@ -29,7 +29,7 @@ pipeline {
                     sh """                        
                         docker login -u $USER -p $PSWD
                         for img in wli0807/cat:JR10 wli0807/cat:latest wli0807/helloworld:JR10 wli0807/helloworld:latest \
-                               wli0807/mynginx:JR10 wli0807/mynginx:latest; \
+                               wli0807/web-nginx:JR10 wli0807/web-nginx:latest; \
                         do docker push \$img; done;
                     """
                 }
