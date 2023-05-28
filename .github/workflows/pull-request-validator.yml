@@ -1,0 +1,20 @@
+name: Pull Request Validator
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Validate pull request title
+      id: validate-title
+      run: |
+        TITLE=$(jq .pull_request.title ${GITHUB_EVENT_PATH}|tr -d \") 
+        echo $TITLE
+        if ! [[ $TITLE =~ ^jiangren-[0-9]{4}\w* ]]; then
+          echo "ERROR: PR title must start with 'jiangren-' and digits, e.g. jiangren-1234"
+          exit 1
+        fi

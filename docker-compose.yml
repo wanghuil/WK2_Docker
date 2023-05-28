@@ -6,7 +6,7 @@ services:
     image: wli0807/mynginx:10
     ports:
     - "5001:80"
-  mycat:
+  cat:
     image: wli0807/cat:10
     ports:
     - "5000:5000"
