@@ -1,0 +1,44 @@
+name: Docker Image CI
+
+on:
+#  workflow_dispatch
+  push:
+    branches: [ "feature/regex" ]
+
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Build the Docker image
+      run: |
+        cd Cat && docker build . -t wli0807/cat:action10
+        cd ../helloworld && docker build . -t wli0807/helloworld:action10
+        cd ../web-nginx && docker build . -t wli0807/mynginx:action10
+        
+    - name: Upload the Docker image
+      run: |
+        docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        docker push wli0807/cat:action10
+        docker push wli0807/helloworld:action10
+        docker push wli0807/mynginx:action10
+
+    - name: SSH to Remote Server and Run docker-compose
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: 34.16.133.22
+        username: root
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        port: 2020        
+        script: |
+          echo "Running command on remote server"
+          cd ~/WK2_Docker
+          git pull
+          sudo docker-compose down
+          sudo docker-compose up -d
+          sudo docker-compose ps        
